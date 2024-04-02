@@ -1,0 +1,37 @@
+CREATE TABLE BOARD(
+	IDX INT NOT NULL AUTO_INCREMENT ,
+	TITLE VARCHAR(50) NULL,
+	CONTENT VARCHAR(2000) NOT NULL,
+	WRITER  VARCHAR(50) NOT NULL,
+	INDATE DATETIME DEFAULT NOW(),
+	COUNT  INT  DEFAULT 0,
+	IMG VARCHAR(500),
+	PRIMARY KEY(IDX)
+);
+COMMIT;
+
+--DROP TABLE BOARD;
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('강아지를 잘 키우는 법', 'ㅋㅋ타고나세요', '강아지');
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('아웅캬웅!!', '강아지좋아아앙', '강형욱');
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('왜 밤하늘을 날아요?', 'WHY?ㅋㅋ;;', '의문세');
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('학원내 괴롭힘 고발가능 한가요?', '만우절 심한장난... 어떻게 대처해야하나요?', '양호영');
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('호영씨 이름 다 보여요', '뭔 대처에요 받아들이세요', '엄준식');
+
+INSERT INTO BOARD(TITLE, CONTENT, WRITER)
+VALUES('라라라~ 라라라~', '잘 잤당', '이지호');
+
+
+-- 최신
+delete FROM BOARD where title = '';
+    
+SELECT @rownum := @rownum + 1 AS ROWNUM, b.* FROM (SELECT * FROM BOARD WHERE WRITER = 'ㄱㄱ' ORDER BY INDATE DESC LIMIT 1) b, (SELECT @rownum := 0) rownum;
