@@ -46,7 +46,8 @@
 
 			<!-- 글쓰기 form -->
 			<div id="viewForm" style="display: none;">
-				<form id = "upload" action="_URL" method="post" enctype="multipart/form-data" >
+				<form id="upload" action="_URL" method="post"
+					enctype="multipart/form-data">
 					<div class="panel-body">
 						<table class="table table-bordered table-hover">
 							<tr>
@@ -81,50 +82,8 @@
 		$(document).ready(function() {
 
 			loadList();
-
-			//1. 게시글 전체 조회 요청
-			function loadList() {
-				$.ajax({
-					url : "boardList",
-					type : "get",
-					dataType : "json",
-					success : makeView, //응답코드가 200일때 success, callback function 불러오기
-					error : function() {
-						alert("error");
-					}
-				});
-			}
-			// loadList 에서 요청 성공시 콜백함수
-			function makeView(data) {
-				console.log(data);
-
-				let html = "";
-				//jQuery for-each
-				$.each(data, function(idx, board) {
-					console.log(board);
-					html += "<tr>"
-					html += "<td scope='row'>" + idx + "</td>"
-					//클릭하면 상세내용 보이게
-					html += "<td><a href='javascript:goContent("+board.idx+")'>" + board.title + "</a></td>"
-					html += "<td>" + board.writer + "</td>"
-					html += "<td>" + board.indate + "</td>"
-					html += "<td>" + board.count + "</td>"
-					html += "</tr>"
-					
-					// 상세내용 추가
-					html += "<tr id='title"+board.idx+"' style='display:none'>"
-					html += "<td scope='row'> 내용 </td>"
-					html += "<td colspan='4'>"
-					
-					if(board.img != null){
-						html += "<img width='300px' src='resources/board/" + board.img + "'>"						
-						html += "<br><br>"
-					}
-					html += "<textarea row='7' class='form-control' readonly='readonly'>" + board.content + "</textarea>"
-					html += "</tr>"
-				});
-				$("#list").html(html);
-			}
+			
+			
 
 			// 글쓰기를 눌렀을떄 함수 실행
 			$("#goForm").on("click", function() {
@@ -162,7 +121,6 @@
 			})
 		});
 		
-		
 		// 목록을 눌렀을떄 함수 실행
 		function goContent(idx){
 			
@@ -170,8 +128,124 @@
 				$("#title"+idx).css("display", "table-row");//tr은 실체가 없으니 block 하면 안됨
 			}else{
 				$("#title"+idx).css("display", "none");				
+				$.ajax({
+					url:"addCount",
+					type:"post",
+					data:{"idx": idx},
+					cache:false,
+					timeout: 10000, //10초
+					success: loadList,
+					error : function() {
+						alert("error");
+					}
+				})
 			}
 			
+		}
+		
+		//글 삭제
+		function goDelete(boardIdx){
+			$.ajax({
+				url:"boardDelete",
+				type:"post",
+				data:{idx: boardIdx},
+				dataType: "text", //이거 쓰면 문제 생김 왜지?
+				cache:false,
+				timeout: 10000, //10초
+				success: loadList,
+				error : function() {
+					alert("error");
+				}
+			})
+		}
+		
+		//글 수정
+		function goUpdate(idx){
+			$("#ta"+idx).attr("readonly",false);
+			$("#to"+idx).css("display", "none")
+			$("#up"+idx).css("display", "inline")
+
+			let title = $("#t"+idx).text()
+			let writer = $("#w"+idx).text()
+			
+			let newTitle = "<input id='nt"+idx+"' type='text' name = 'title' class='form-control' value = '" + title + "'>"
+			let newWriter = "<input id = 'nw"+idx+"' type='text' name = 'writer' class='form-control' value = '"+ writer +"'>"
+			
+			$("#t"+idx).html(newTitle);
+			$("#w"+idx).html(newWriter);
+			
+		}
+		// 글 작성을 눌렀을 때 함수 실행
+		function update(idx) {
+			
+			let title = $("#nt"+idx).val()
+			let writer = $("#nw"+idx).val()
+			let content = $("#ta"+idx).val()
+			
+			console.log(title+" "+content)
+			
+			$.ajax({
+				url:"boardUpdate",
+				type:"post",
+				data:{"idx":idx, "title":title, "writer":writer, "content":content},
+				//dataType:"json", //받아오는 데이터의 형태를 명시
+				cache:false,
+				timeout: 10000, //10초
+				success: loadList,
+				error : function() {
+					alert("error");
+				}
+			})
+		}
+		
+		//1. 게시글 전체 조회 요청
+		function loadList() {
+			$.ajax({
+				url : "boardList",
+				type : "get",
+				dataType : "json",
+				success : makeView, //응답코드가 200일때 success, callback function 불러오기
+				error : function() {
+					alert("error");
+				}
+			});
+		}
+
+		// loadList 에서 요청 성공시 콜백함수
+		function makeView(data) {
+			console.log(data);
+
+			let html = "";
+			//jQuery for-each
+			$.each(data, function(idx, board) {
+				console.log(board);
+				html += "<tr>"
+				html += "<td scope='row'>" + idx + "</td>"
+				//클릭하면 상세내용 보이게
+				html += "<td id='t"+board.idx+"'><a href='javascript:goContent("+board.idx+")'>" + board.title + "</a></td>"
+				html += "<td id='w"+board.idx+"'>" + board.writer + "</td>"
+				html += "<td>" + board.indate + "</td>"
+				html += "<td>" + board.count + "</td>"
+				html += "</tr>"
+				
+				// 상세내용 추가
+				html += "<tr id='title"+board.idx+"' style='display:none'>"
+				html += "<td scope='row'> 내용 </td>"
+				html += "<td colspan='4'>"
+				
+				if(board.img != null){
+					html += "<img width='300px' src='resources/board/" + board.img + "'>"						
+					html += "<br><br>"
+				}
+				html += "<textarea id='ta"+board.idx+"' row='7' class='form-control' readonly='readonly'>" + board.content + "</textarea>"
+				html += "<br>"
+				html += "<button id = 'to"+board.idx+"' onclick = 'goUpdate("+board.idx+")' class='btn btn-outline-primary'>수정</button>&nbsp;"
+				html += "<span><button id = 'up"+board.idx+"' onclick = 'update("+board.idx+")' class='btn btn-outline-primary' style='display:none'>등록</button></span>&nbsp;"
+				html += "<span><button onclick='goDelete("+board.idx+")' class='btn btn-outline-danger'>삭제</button></span>"
+				html += "</td>"
+				html += "</tr>"
+			});
+			$("#list").html(html);
 		}
 	</script>
 </body>

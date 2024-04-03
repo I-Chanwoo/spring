@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.smhrd.entity.Board;
@@ -89,17 +90,15 @@ public class BoardController {
 	};
 	
 
-//	//get 방식으로 인자 가져옴
-//	@RequestMapping("/boardContent")
-//	public String searchBoardByIdx(@RequestParam("idx") int idx, Model model) {
-//		System.out.println("게시글 조회");
-//		System.out.println("controller >> BoardController >> searchBoardByIdx()");
-//		Board content = mapper.searchBoardByIdx(idx);//게시글 정보 가져오기
-//		mapper.addCount(idx);//조회수 올리기
-//		//한 페이지에서만 사용하는 것이기에 모델에 저장함
-//		model.addAttribute("content", content); //object로 업캐스팅
-//		return "boardContent";
-//	}
+	//get 방식으로 인자 가져옴
+	@RequestMapping("/addCount")
+	public @ResponseBody void addCount(@RequestParam("idx") int idx) {
+		System.out.println("게시글 조회수");
+		System.out.println("controller >> BoardController >> searchBoardByIdx()");
+
+		mapper.addCount(idx);//조회수 올리기
+
+	}
 //	
 //	//보드 작성
 //	//forward 방식으로 이동 -> 데이터를 입력할떄 리다이렉트 조회할떄 포워딩
@@ -153,15 +152,13 @@ public class BoardController {
 //	};
 //	
 //	
-//	//get 방식으로 인자 가져옴
-//	@RequestMapping("/boardDelete")
-//	public String boardDelete(@RequestParam("idx") int idx, Model model) {
-//		System.out.println("게시글 삭제");
-//		System.out.println("controller >> BoardController >> boardDelete()");
-//		mapper.boardDelete(idx);
-//		
-//		return "redirect:/boardList";
-//	}
+	//get 방식으로 인자 가져옴
+	@RequestMapping("/boardDelete")
+	public @ResponseBody void boardDelete(@RequestParam("idx") int idx) {
+		System.out.println("게시글 삭제");
+		System.out.println("controller >> BoardController >> boardDelete()");
+		mapper.boardDelete(idx);
+	}
 //	
 //	//게시글 수정
 //	@RequestMapping("/boardUpdateForm")
@@ -171,14 +168,12 @@ public class BoardController {
 //		model.addAttribute("content", content);
 //		return "boardUpdateForm";
 //	}
-//	@RequestMapping("/boardUpdate")
-//	public String boardUpdate(Board content) {
-//		System.out.println("게시글 수정");
-//		System.out.println("controller >> BoardController >> boardUpdate()");
-//		System.out.println("받아온 값: "+content.toString());
-//		mapper.boardUpdate(content);
-//		
-//		return "redirect:/boardContent?idx="+String.valueOf(content.getIdx());
-//	}
+	@RequestMapping("/boardUpdate")
+	public @ResponseBody void boardUpdate(Board content) {
+		System.out.println("게시글 수정");
+		System.out.println("controller >> BoardController >> boardUpdate()");
+		
+		mapper.boardUpdate(content);
+	}
 	
 }
